@@ -6,7 +6,7 @@ import json
 
 
 class PrivatBankAPI:
-    BASE_URL = 'https://api.privatbank.ua/p24api/exchange_rates?json&date='
+    BASE_URL = "https://api.privatbank.ua/p24api/exchange_rates?json&date="
 
     async def fetch_rates_for_date(self, session: aiohttp.ClientSession, date: datetime) -> dict:
         url = self.BASE_URL + date.strftime("%d.%m.%Y")
@@ -36,7 +36,7 @@ class ExchangeRateService:
                 try:
                     data = await self.api.fetch_rates_for_date(session, date)
                     rates = self.extract_usd_eur(data)
-                    results.append((date.strftime('%Y-%m-%d'), rates))
+                    results.append((date.strftime("%Y-%m-%d"), rates))
                 except Exception as e:
                     print(f"Помилка: {e}", file=sys.stderr)
             return results
@@ -44,13 +44,13 @@ class ExchangeRateService:
     def extract_usd_eur(self, data: dict):
         rates = {}
         try:
-            exchange_rates = data.get('exchangeRate', [])
+            exchange_rates = data.get("exchangeRate", [])
             for item in exchange_rates:
-                currency = item.get('currency')
-                if currency in ('USD', 'EUR'):
+                currency = item.get("currency")
+                if currency in ("USD", "EUR"):
                     rates[currency] = {
-                        'purchaseRate': item.get('purchaseRate', None),
-                        'saleRate': item.get('saleRate', None)
+                        "purchaseRate": item.get("purchaseRate", None),
+                        "saleRate": item.get("saleRate", None)
                     }
         except Exception as e:
             raise Exception(f"Помилка обробки даних API: {e}")
@@ -70,14 +70,14 @@ class ConsoleApp:
                 day_entry = {
                     date_str: {
                         ccy: {
-                            'purchase': rates[ccy]['purchaseRate'],
-                            'sale': rates[ccy]['saleRate']
+                            "purchase": rates[ccy]["purchaseRate"],
+                            "sale": rates[ccy]["saleRate"]
                         } for ccy in rates
                     }
                 }
                 output_data.append(day_entry)
 
-            with open('exchange_rates.json', 'w', encoding='utf-8') as f:
+            with open("exchange_rates.json", "w", encoding="utf-8") as f:
                 json.dump(output_data, f, ensure_ascii=False, indent=2)
 
             print(f"\nДані збережено у файлі exchange_rates.json")
@@ -90,7 +90,7 @@ class ConsoleApp:
 
 if __name__ == "__main__":
     import platform
-    if platform.system() == 'Windows':
+    if platform.system() == "Windows":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
     api = PrivatBankAPI()
